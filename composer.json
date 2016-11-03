@@ -6,8 +6,8 @@
     "keywords": ["laravel","piwik"],
     "authors": [
         {
-            "name": "Rob Brazier",
-            "email": "rob.brazier@me.com"
+            "name": "Ryan Moultrup",
+            "email": "ryan@spectrumwebsolution.com"
         }
     ],
     "require": {
@@ -22,8 +22,8 @@
     },
     "autoload": {
         "psr-0": {
-            "RobBrazier\\Piwik": "src/"
+            "RyanMoultrup\\Piwik": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "1.*"
 }
