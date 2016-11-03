@@ -1,0 +1,29 @@
+{
+    "name": "ryanmoultrup/piwik",
+    "description": "Piwik Package for Laravel",
+    "license": "MIT",
+    "version": "2.1.3",
+    "keywords": ["laravel","piwik"],
+    "authors": [
+        {
+            "name": "Rob Brazier",
+            "email": "rob.brazier@me.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "guzzlehttp/guzzle": "6.2.1",
+        "illuminate/support": "~5.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.27",
+        "phpunit/phpcov": "2.0.2",
+        "mockery/mockery": "0.9.5"
+    },
+    "autoload": {
+        "psr-0": {
+            "RobBrazier\\Piwik": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
