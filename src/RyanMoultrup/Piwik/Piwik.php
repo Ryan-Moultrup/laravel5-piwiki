@@ -2,9 +2,8 @@
 
 namespace RyanMoultrup\Piwik;
 
-// include 'httpful/src/Httpful/Request.php';
 use GuzzleHttp\Client;
-// use Httpful\Request;
+use Illuminate\Support\Facades\Config;
 
 /**
  * Repository: https://github.com/VisualAppeal/Piwik-PHP-API
@@ -35,7 +34,7 @@ class Piwik
 	private $_site = '';
 	private $_token = '';
 	private $_siteId = 0;
-	private $_format = self::FORMAT_PHP;
+	private $_format = self::FORMAT_JSON;
 	private $_language = 'en';
 
 	private $_period = self::PERIOD_DAY;
@@ -60,17 +59,32 @@ class Piwik
 	/**
 	 * Create new instance
 	 *
-	 * @param string $site URL of the piwik installation
-	 * @param string $token API Access token
-	 * @param int $siteId ID of the site
-	 * @param string $format
-	 * @param string $period
-	 * @param string $date
-	 * @param string $rangeStart
-	 * @param string $rangeEnd
 	 */
-	function __construct($site, $token, $siteId, $format = self::FORMAT_JSON, $period = self::PERIOD_DAY,
-		$date = self::DATE_YESTERDAY, $rangeStart = '', $rangeEnd = null)
+	function __construct() {
+		$this->_site = $this->config('piwik.piwik_url');
+		$this->_token = $this->config('piwik.api_key');
+		// $this->_siteId = $this->config('piwik.');
+		$this->_format = $this->config('piwik.format');
+		$this->_period = $this->config('piwik.period');
+		$this->setDate($this->config('piwik.date'));
+		// dd($this->config('piwik.piwik_url'));
+	}
+
+	/**
+	 * description
+	 *
+	 * @param string   $site          URL of the piwik installation
+	 * @param string   $token         API Access token
+	 * @param int      $siteId        ID of the site
+	 * @param string   $format
+	 * @param string   $period
+	 * @param string   $date
+	 * @param string   $rangeStart
+	 * @param string   $rangeEnd
+	 * @return object                 An instance of this class
+	 */
+	public function init($site, $token, $siteId, $format = self::FORMAT_JSON, $period = self::PERIOD_DAY,
+		$date = self::DATE_YESTERDAY, $rangeStart = '', $rangeEnd = null) 
 	{
 		$this->_site = $site;
 		$this->_token = $token;
@@ -84,7 +98,18 @@ class Piwik
 			$this->setRange($rangeStart, $rangeEnd);
 		else
 			$this->setDate($date);
+
+		return $this;
 	}
+
+	/**
+     * @param   $key string         configuration key
+     * @param   $default string     default value if null
+     * @return mixed
+     */
+    private function config($key, $default = null) {
+        return Config::get($key, $default);
+    }
 
 	/**
 	 * Getter & Setter
@@ -347,15 +372,15 @@ class Piwik
 	 */
 	private function _request($method, $params = [], $optional = []) {
 		$url = $this->_parseUrl($method, $params + $optional);
+		
 		if ($url === false)
 			return false;
 
-		$req = Request::get($url);
-		$req->strict_ssl = $this->verifySsl;
-		$req->max_redirects = $this->maxRedirects;
-		$req->setConnectionTimeout(5);
+		$client = new Client();
+		$response = $client->get($url);
+        $body = $response->getBody();
 
-		$buffer = $req->send();
+		$buffer = $body->getContents();
 
 		if (!empty($buffer))
 			$request = $this->_parseRequest($buffer);
@@ -2908,7 +2933,7 @@ class Piwik
 	 * @param int $disableCookies
 	 * @param array $optional
 	 */
-	public function getJavascriptTag($piwikUrl, $mergeSubdomains = '', $groupPageTitlesByDomain = '',
+	public function getJavascriptTag($piwikUrl='', $mergeSubdomains = '', $groupPageTitlesByDomain = '',  //  $idSite, 
 		$mergeAliasUrls = '', $visitorCustomVariables = '', $pageCustomVariables = '',
 		$customCampaignNameQueryParam = '', $customCampaignKeywordParam = '', $doNotTrack = '',
 		$disableCookies = '', $optional = [])
